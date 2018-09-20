@@ -18,23 +18,23 @@ gap = 10
 
 
 class FirstRunView(tk.Frame):
-    def __init__(self, parent, frameBackground=main_background_color, buttonBackground=box_color):
-        super().__init__(parent, background=frameBackground)
+    def __init__(self, parent, frame_background=main_background_color, button_background=box_color):
+        super().__init__(parent, background=frame_background)
         root.minsize(root.winfo_width(), root.winfo_height())
         self.pack(expand=True, fill='both')
         
-        frame = tk.Frame(self,background=frameBackground)
+        frame = tk.Frame(self,background=frame_background)
         frame.place(relx=0.5, rely=0.5, anchor='center')
         
         l1 = tk.Label(frame, text="Welcome to Keeper!\n")
-        l1.config(background=frameBackground)
+        l1.config(background=frame_background)
         
         b1 = tk.Button(frame, text="Create New Note")
-        b1.config(background=buttonBackground, activebackground=buttonBackground)
+        b1.config(background=button_background, activebackground=button_background)
         b1.bind('<Button-1>', self.create_first_note)
         
         b2 = tk.Button(frame, text="Import Notes")
-        b2.config(background=buttonBackground, activebackground=buttonBackground)
+        b2.config(background=button_background, activebackground=button_background)
         b2.bind('<Button-1>', self.import_files)
         
         for widget in (l1, b1, b2):
@@ -49,7 +49,7 @@ class FirstRunView(tk.Frame):
         
         
 class ScrollableNoteBoxView(tk.Frame):
-    def __init__(self, parent, background=main_background_color, init=True):
+    def __init__(self, parent, background=main_background_color):
         super().__init__(parent, background=background)
         self.frame_list = []
         self.box_list = []
@@ -229,12 +229,11 @@ class NoteBox(tk.Label):
         self.height = self.winfo_reqheight()
         
         if path:
-            self.path = path
             self.read_note(path)
             self.wrap_text(width, lines)
         
     def on_click(self, event):
-        open_EditText(root.main_view.get_list_index(event.widget))
+        open_EditText(event.widget)
     
     def on_click_delete(self, event):
         choice = messagebox.askyesno("Confirm...", "Delete note?")
@@ -322,7 +321,7 @@ class NoteBox(tk.Label):
         
         
 class EditText(tk.Frame):
-    def __init__(self, parent, index):
+    def __init__(self, parent, notebox):
         super().__init__(parent)
         self.pack(expand=True, fill='both', side='top')
         self.grid_columnconfigure(1, weight=1)
@@ -333,11 +332,11 @@ class EditText(tk.Frame):
         self.text = tk.Text(self, wrap='word', background=box_color, font=font, undo=True)
         self.scrollbar = tk.Scrollbar(self, command=self.text.yview, background=box_color, width=3)
         
-        if index is None:
+        if notebox is None:
             self.new = True
         else:
             self.new = False
-            self.load_note(index)
+            self.load_note(notebox)
         
         self.back.grid(row=0, column=0, sticky='ns')
         self.title.grid(row=0, column=1, columnspan=2, sticky='we')
@@ -347,8 +346,8 @@ class EditText(tk.Frame):
         
         self.bind_keys()
         
-    def load_note(self, index):
-        self.notebox = root.main_view.box_list[index]
+    def load_note(self, notebox):
+        self.notebox = notebox
         self.title.insert('end', self.notebox.title)
         self.text.insert('end', self.notebox.body_text)
         
@@ -385,9 +384,9 @@ class EditText(tk.Frame):
 def get_notes():
     return sorted(glob.glob(os.path.join(notes_dir, '*.note')), reverse=True)
 
-def open_EditText(index=None):
+def open_EditText(notebox=None):
     root.main_view.pack_forget()
-    EditText(root, index=index)
+    EditText(root, notebox=notebox)
     
 def open_import_dialog(window, first_run=False):
     notes = filedialog.askopenfilenames(initialdir=os.path.expanduser('~/Downloads/Takeout/Keep'),
