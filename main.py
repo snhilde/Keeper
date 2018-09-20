@@ -104,6 +104,8 @@ class ScrollableNoteBoxView(tk.Frame):
         
         self.maxWidth = int(self.frameWidth * 0.95)
         self.maxLines = self.frameWidth // windowRatio // font.metrics('linespace')
+        if not self.maxLines:
+            self.maxLines = 1
         
     def deleteFrames(self):
         items = self.canvas.find_all()
@@ -132,7 +134,7 @@ class ScrollableNoteBoxView(tk.Frame):
             noteBox = self.createBox(note, self.maxWidth, self.maxLines)
             self.assignBox(noteBox)
             
-    def createBox(self, path=None, width=0, lines=0, new=False):
+    def createBox(self, path=None, width=0, lines=1, new=False):
         noteBox = NoteBox(self, path=path, width=width, lines=lines)
         if new:
             self.boxList.insert(0, noteBox)
