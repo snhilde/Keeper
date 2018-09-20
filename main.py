@@ -66,9 +66,9 @@ class ScrollableNoteBoxView(tk.Frame):
         self.canvas = tk.Canvas(self, background=background, borderwidth=0, highlightthickness=0)
         self.scrollbar = tk.Scrollbar(self, command=self.canvas.yview, background=background, width=3)
         self.new_button = tk.Button(self, text="+", padx=0,
-                background=background, activebackground=background)
+                                    background=background, activebackground=background)
         self.import_button = tk.Button(self, text="\u2026", padx=0,
-                background=background, activebackground=background)
+                                        background=background, activebackground=background)
         
         self.canvas.grid(row=1, column=1, sticky='nesw')
         self.scrollbar.grid(row=0, column=3, sticky='nesw', rowspan=3)
@@ -172,7 +172,7 @@ class ScrollableNoteBoxView(tk.Frame):
         for index, frame in enumerate(self.frame_list):
             frame.config(height=frame.height)
             frame.tag = self.canvas.create_window(index*self.frame_width + index*gap, 0,
-                    window=frame, anchor='nw')
+                                                  window=frame, anchor='nw')
             #  self.canvas.update()
         self.canvas.config(scrollregion=self.canvas.bbox('all'))
         
@@ -194,7 +194,7 @@ class ScrollableNoteBoxView(tk.Frame):
         import_button_y = root.winfo_height() - 2
         self.import_button.place(x=import_button_x, y=import_button_y, anchor='se')
         self.new_button.place(x=import_button_x-self.import_button.winfo_reqwidth()-2,
-                y=import_button_y, anchor='se')
+                              y=import_button_y, anchor='se')
         
     def refresh(self):
         self.delete_frames()
@@ -411,7 +411,8 @@ def import_notes(html_list, first_run=False):
         if html_file[-4:] != 'html':
             continue
         
-        notebox = NoteBox(root.main_view, width=root.main_view.max_width, lines=root.main_view.max_lines)
+        notebox = NoteBox(root.main_view, width=root.main_view.max_width,
+                          lines=root.main_view, max_lines)
         new_boxes.append(notebox)
         
         if first_run:
@@ -455,11 +456,11 @@ def process_date(date):
     daytime_bool = re.search('AM', date)
     
     return "{}-{}-{:02}T{:02}_{:02}_{:02}.note".format(year,
-                                            month, 
-                                            day,
-                                            hour if daytime_bool else hour + 12,
-                                            minute,
-                                            second)
+                                                       month,
+                                                       day,
+                                                       hour if daytime_bool else hour + 12,
+                                                       minute,
+                                                       second)
     
 def main():
     root.main_view = ScrollableNoteBoxView(root)
