@@ -8,9 +8,9 @@ import os
 import re
 import time
 
-notesDir = os.path.expanduser('~/.local/share/keep/notes')
+notesDir = os.path.expanduser('~/.local/share/keeper/notes')
 root = tk.Tk()
-root.title("Keep")
+root.title("Keeper")
 font = tkfont.Font()
 mainBackgroundColor = '#E6E6E6'
 boxColor = '#FAFAFA'
@@ -25,7 +25,7 @@ class FirstRunView(tk.Frame):
         frame = tk.Frame(self,background=frameBackground)
         frame.place(relx=0.5, rely=0.5, anchor='center')
         
-        l1 = tk.Label(frame, text="Welcome to Keep!\n")
+        l1 = tk.Label(frame, text="Welcome to Keeper!\n")
         l1.config(background=frameBackground)
         
         b1 = tk.Button(frame, text="Create New Note")
