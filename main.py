@@ -54,19 +54,23 @@ class ScrollableNoteBoxView(tk.Frame):
         self.frameWidth = 0
         
         self.pack(expand=True, fill='both')
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_rowconfigure(0, minsize=gap//2)
+        self.grid_rowconfigure(2, minsize=gap//2)
+        self.grid_columnconfigure(1, weight=1)
+        self.grid_columnconfigure(0, minsize=gap)
+        self.grid_columnconfigure(2, minsize=gap)
         
-        self.scrollbar = tk.Scrollbar(self, background=background, width=3)
-        self.canvas = tk.Canvas(self, background=background)
+        self.canvas = tk.Canvas(self, background=background, borderwidth=0, highlightthickness=0)
+        self.scrollbar = tk.Scrollbar(self, command=self.canvas.yview, background=background, width=3)
         self.newButton = tk.Button(self, text="+", padx=0,
                 background=background, activebackground=background)
         self.importButton = tk.Button(self, text="\u2026", padx=0,
                 background=background, activebackground=background)
         
-        self.scrollbar.config(command=self.canvas.yview)
+        self.canvas.grid(row=1, column=1, sticky='nesw')
+        self.scrollbar.grid(row=0, column=3, sticky='nesw', rowspan=3)
         self.canvas.config(yscrollcommand=self.scrollbar.set)
-        
-        self.scrollbar.pack(side='right', fill='y')
-        self.canvas.pack(side='left', expand=True, fill='both')
         
         self.newButton.bind('<Button-1>', self.newNote)
         self.importButton.bind('<Button-1>', self.importFiles)
@@ -93,8 +97,9 @@ class ScrollableNoteBoxView(tk.Frame):
         
     def getSizes(self):
         root.update_idletasks()
-        self.numFrames = (root.winfo_width() // 300) + 1
-        self.frameWidth = (root.winfo_width() - gap - self.scrollbar.winfo_width()) // self.numFrames - gap
+        totalWidth = root.winfo_width() - 2 * gap - self.scrollbar.winfo_width()
+        self.numFrames = totalWidth // 300 + 1
+        self.frameWidth = (totalWidth + gap) // self.numFrames - gap
         windowRatio = root.winfo_width() / root.winfo_height()
         
         self.maxWidth = int(self.frameWidth * 0.95)
@@ -160,12 +165,9 @@ class ScrollableNoteBoxView(tk.Frame):
     def displayAll(self):
         for index, frame in enumerate(self.frameList):
             frame.config(height=frame.height)
-            frame.tag = self.canvas.create_window(index*self.frameWidth + index*gap + gap, gap//5, window=frame, anchor='nw')
-            
-        #TODO fix scroll region to not scroll when window is big enough to hold all contents
-        #  print(self.canvas.bbox('all'))
-        #  print(root.geometry())
-        # see: (186) self.canvas.coords(frame.tag, index*self.frameWidth + index*gap + gap, gap//5)
+            frame.tag = self.canvas.create_window(index*self.frameWidth + index*gap, 0,
+                    window=frame, anchor='nw')
+            #  self.canvas.update()
         self.canvas.config(scrollregion=self.canvas.bbox('all'))
         
     def resizeWindow(self, event=None):
@@ -173,6 +175,7 @@ class ScrollableNoteBoxView(tk.Frame):
             currFrames = self.numFrames
         except:
             return
+        
         self.placeButtons()
         self.getSizes()
         if currFrames != self.numFrames:
@@ -195,7 +198,7 @@ class ScrollableNoteBoxView(tk.Frame):
     def resizeWidgets(self):
         for index, frame in enumerate(self.frameList):
             frame.config(width=self.frameWidth)
-            self.canvas.coords(frame.tag, index*self.frameWidth + index*gap + gap, gap//2)
+            self.canvas.coords(frame.tag, index*self.frameWidth + index*gap, 0)
         for noteBox in self.boxList:
             noteBox.wrapText(self.maxWidth, self.maxLines)
             
