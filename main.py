@@ -210,10 +210,7 @@ class ScrollableNoteBoxView(tk.Frame):
             return
         
         self.place_buttons()
-        self.get_sizes()
-        if current_num_frames != self.num_frames:
-            self.refresh()
-        self.resize_widgets()
+        self.refresh()
         self.lift_buttons()
         
     def place_buttons(self):
@@ -224,8 +221,10 @@ class ScrollableNoteBoxView(tk.Frame):
                               y=import_button_y, anchor='se')
         
     def refresh(self):
+        self.get_sizes()
         self.delete_frames()
         self.create_frames()
+        self.resize_widgets()
         self.reassign_boxes()
         self.display_all()
         
