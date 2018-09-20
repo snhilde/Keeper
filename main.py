@@ -137,7 +137,7 @@ class ScrollableNoteBoxView(tk.Frame):
         
     def assignBox(self, box):
         frame = self.getNextFrame(self.frameList)
-        box.pack(in_=frame, expand=True, fill='x', pady=(gap//2))
+        box.pack(in_=frame, fill='x', pady=(gap//2))
         frame.height += box.height + gap
             
     def reassignBoxes(self):
