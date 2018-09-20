@@ -18,6 +18,15 @@ gap = 10
 
 
 class FirstRunView(tk.Frame):
+    """The starting screen a user sees when there are no notes, or when all notes have been deleted.
+    
+    Args:
+        parent (obj): tkinter object that will contain the class
+        frame_background (str, optional): tkinter color (defined word, 6-digit hex, etc.) for background
+        button_background (str, optional): tkinter color (defined word, 6-digit hex, etc.) for buttons
+        
+    """
+    
     def __init__(self, parent, frame_background=main_background_color, button_background=box_color):
         super().__init__(parent, background=frame_background)
         root.minsize(root.winfo_width(), root.winfo_height())
@@ -49,6 +58,24 @@ class FirstRunView(tk.Frame):
         
         
 class ScrollableNoteBoxView(tk.Frame):
+    """The main view of the program, displays all notes and enables insertion, deletion, etc.
+    
+    This view is created when the program loads and hidden/shown when needed.
+    
+    Args:
+        parent (obj): Tkinter object that will contain the class.
+        background (str, optional): Tkinter color (defined word, 6-digit hex, etc.) for background.
+    
+    Attributes:
+        frame_list (list): List of all frames on the drawing canvas.
+        box_list (list): List of all boxes created, independent from frames.
+        frame_width (int): Width of frames (same for all).
+        num_frames (int): Number of frames, calculated at init and when window size changes.
+        max_width (int): Maximum width in pixels of text that a box can display.
+        max_lines (int): Maximum rows of text that a box can hold.
+    
+    """
+    
     def __init__(self, parent, background=main_background_color):
         super().__init__(parent, background=background)
         self.frame_list = []
@@ -215,6 +242,37 @@ class ScrollableNoteBoxView(tk.Frame):
         
         
 class NoteBox(tk.Label):
+    """Individual box that displays the note's text.
+    
+    There is always one box per note. Clicking on the box will open an EditText
+    window to edit the note's text. During a window resizing event, boxes are not
+    created or destroyed; their containing text is re-wrapped, and the boxes are
+    reassigned to the frames to ensure proper stacking.
+    
+    Args:
+        parent (obj): Tkinter object that will contain the class.
+        path (str, optional): Absolute path to a note that the box will read in.
+        width (int, optional): Maximum width in pixels of text that the box can
+                               display. Usually comes from max_width in
+                               ScrollableNoteBoxView.
+        lines (int, optional): Maximum rows of text that the box can hold. Usually
+                               comes from max_lines in ScrollableNoteBoxView.
+        background (str, optional): Tkinter color (defined word, 6-digit hex,
+                                    etc.) for background.
+    
+    Attributes:
+        parent (obj): Tkinter object that contains the box.
+        path (str): Absolute path to the saved note's location on disk.
+        title (str): Title of the note.
+        text_lines (list): Lines of text as read from the note, stripped
+                           of newlines.
+        body_text (str): Full text of the note's body. Formed by joining
+                         text_lines together with newlines.
+        wrapped_text (str): Body text wrapped to correctly display in the box.
+        height (int): Height of the box in pixels.
+    
+    """
+    
     def __init__(self, parent, path=None, width=0, lines=0, background=box_color):
         super().__init__(parent, background=background, anchor='w', justify='left', font=font, wrap=None)
         self.parent = parent
@@ -321,6 +379,14 @@ class NoteBox(tk.Label):
         
         
 class EditText(tk.Frame):
+    """Editor window to edit a note's title and body.
+    
+    Args:
+        parent (obj): Tkinter object that will contain the class.
+        notebox (int): Notebox that will be edited.
+        
+    """
+    
     def __init__(self, parent, notebox):
         super().__init__(parent)
         self.pack(expand=True, fill='both', side='top')
