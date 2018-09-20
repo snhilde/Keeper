@@ -476,7 +476,7 @@ def import_notes(html_list, first_run=False):
             continue
         
         notebox = NoteBox(root.main_view, width=root.main_view.max_width,
-                          lines=root.main_view, max_lines)
+                          lines=root.main_view.max_lines)
         new_boxes.append(notebox)
         
         if first_run:
