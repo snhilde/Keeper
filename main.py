@@ -514,33 +514,20 @@ def check_for_directory():
 def import_notes(html_list:List[str], first_run:bool=False):
     root.main_view.get_sizes()
     new_boxes = []
-    pattern = re.compile('[JFMASOND][aepuco][nbrylgptvc] \d\d?, \d\d\d\d, \d[012]?:\d\d:\d\d [AP]M')
     for html_file in html_list:
         if html_file[-4:] != 'html':
             continue
+        
+        fp = open(html_file)
+        soup = bs4.BeautifulSoup(fp, 'html.parser')
         
         notebox = NoteBox(root.main_view, width=root.main_view.max_width,
                           lines=root.main_view.max_lines)
         new_boxes.append(notebox)
         
-        if first_run:
-            filename = os.path.basename(html_file)[:-15]
-        else:
-            filename = notebox.get_new_date()
+        notebox.title = get_title(soup)
+        filename = get_filename(soup, html_file, notebox, first_run)
         
-        fp = open(html_file)
-        soup = bs4.BeautifulSoup(fp, 'html.parser')
-        
-        notebox.title = soup.title.string
-        if not pattern.match(notebox.title):
-            #  note has a title
-            heading = str(soup.find_all('div', class_='heading')[0])
-            if first_run:
-                filename = process_date(pattern.search(heading).group())
-        else:
-            #  note does not have a title
-            notebox.title = ""
-            
         text = str(soup.find_all('div', class_='content')[0])
         lines = text[21:-6].split('<br/>')
         notebox.set_text(lines)
@@ -550,6 +537,26 @@ def import_notes(html_list:List[str], first_run:bool=False):
     root.main_view.box_list = new_boxes + root.main_view.box_list
     root.main_view.refresh_frames()
                 
+def get_title(soup:bs4.BeautifulSoup) -> str:
+    pattern = re.compile('[JFMASOND][aepuco][nbrylgptvc] \d\d?, \d\d\d\d, \d[012]?:\d\d:\d\d [AP]M')
+    soup_string = soup.title.string
+    if not pattern.match(soup_string):
+        # note has a title
+        return soup_string
+    else:
+        # note does not have a title
+        return ""
+    
+def get_filename(soup:bs4.BeautifulSoup, path:str, notebox:tk.Tk, first_run:bool) -> str:
+    pattern = re.compile('[JFMASOND][aepuco][nbrylgptvc] \d\d?, \d\d\d\d, \d[012]?:\d\d:\d\d [AP]M')
+    if not pattern.match(soup.title.string) and first_run:
+        heading = str(soup.find_all('div', class_='heading')[0])
+        return process_date(pattern.search(heading).group())
+    elif first_run:
+        return os.path.basename(path)[:-15] + '.note'
+    else:
+        return notebox.get_new_date()
+        
 def process_date(date:str) -> str:
     months = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
               'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
