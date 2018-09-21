@@ -504,6 +504,7 @@ def open_import_dialog(window:tk.Tk, first_run:bool=False):
     if notes:
         import_notes(notes, first_run)
         if first_run:
+            root.main_view.pack(expand=True, fill='both')
             root.main_view.init()
             window.destroy()
 
