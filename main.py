@@ -19,16 +19,19 @@ gap = 10
 
 
 class FirstRunView(tk.Frame):
-    """The starting screen a user sees when there are no notes, or when all notes have been deleted.
+    """The starting screen a user sees when there are no notes.
     
     Args:
         parent: tkinter object that will contain the class
-        frame_background (optional): tkinter color (defined word, 6-digit hex, etc.) for background
-        button_background (optional): tkinter color (defined word, 6-digit hex, etc.) for buttons
+        frame_background (optional): tkinter color (defined word,
+                                     6-digit hex, etc.) for background
+        button_background (optional): tkinter color (defined word,
+                                      6-digit hex, etc.) for buttons
         
     """
     
-    def __init__(self, parent:tk.Tk, frame_background:str=main_background_color,
+    def __init__(self, parent:tk.Tk,
+                 frame_background:str=main_background_color,
                  button_background:str=box_color):
         super().__init__(parent, background=frame_background)
         root.minsize(root.winfo_width(), root.winfo_height())
@@ -41,11 +44,13 @@ class FirstRunView(tk.Frame):
         l1.config(background=frame_background)
         
         b1 = tk.Button(frame, text="Create New Note")
-        b1.config(background=button_background, activebackground=button_background)
+        b1.config(background=button_background,
+                  activebackground=button_background)
         b1.bind('<Button-1>', self.create_first_note)
         
         b2 = tk.Button(frame, text="Import Notes")
-        b2.config(background=button_background, activebackground=button_background)
+        b2.config(background=button_background,
+                  activebackground=button_background)
         b2.bind('<Button-1>', self.import_files)
         
         for widget in (l1, b1, b2):
@@ -60,20 +65,23 @@ class FirstRunView(tk.Frame):
         
         
 class ScrollableNoteBoxView(tk.Frame):
-    """The main view of the program, displays all notes and enables insertion, deletion, etc.
+    """The main view of the program, displays all notes.
     
     This view is created when the program loads and hidden/shown when needed.
     
     Args:
         parent: Tkinter object that will contain the class.
-        background (optional): Tkinter color (defined word, 6-digit hex, etc.) for background.
+        background (optional): Tkinter color (defined word, 6-digit hex, etc.)
+                               for background.
     
     Attributes:
         frame_list (list): List of all frames on the drawing canvas.
         box_list (list): List of all boxes created, independent from frames.
         frame_width (int): Width of frames (same for all).
-        num_frames (int): Number of frames, calculated at init and when window size changes.
-        max_width (int): Maximum width in pixels of text that a box can display.
+        num_frames (int): Number of frames, calculated at init and when window
+                          size changes.
+        max_width (int): Maximum width in pixels of text that a box can
+                         display.
         max_lines (int): Maximum rows of text that a box can hold.
     
     """
@@ -92,12 +100,16 @@ class ScrollableNoteBoxView(tk.Frame):
         self.grid_columnconfigure(0, minsize=gap)
         self.grid_columnconfigure(2, minsize=gap)
         
-        self.canvas = tk.Canvas(self, background=background, borderwidth=0, highlightthickness=0)
-        self.scrollbar = tk.Scrollbar(self, command=self.canvas.yview, background=background, width=3)
+        self.canvas = tk.Canvas(self, background=background, borderwidth=0,
+                                highlightthickness=0)
+        self.scrollbar = tk.Scrollbar(self, command=self.canvas.yview,
+                                      background=background, width=3)
         self.new_button = tk.Button(self, text="+", padx=0,
-                                    background=background, activebackground=background)
+                                    background=background,
+                                    activebackground=background)
         self.import_button = tk.Button(self, text="\u2026", padx=0,
-                                        background=background, activebackground=background)
+                                       background=background,
+                                       activebackground=background)
         
         self.canvas.grid(row=1, column=1, sticky='nesw')
         self.scrollbar.grid(row=0, column=3, sticky='nesw', rowspan=3)
@@ -129,28 +141,30 @@ class ScrollableNoteBoxView(tk.Frame):
     def get_sizes(self):
         root.update_idletasks()
         
-        total_width = root.winfo_width() - 2 * gap - self.scrollbar.winfo_width()
+        total_width = root.winfo_width() - 2*gap - self.scrollbar.winfo_width()
         window_ratio = root.winfo_width() / root.winfo_height()
         
         self.num_frames = total_width // 300 + 1
         self.frame_width = (total_width + gap) // self.num_frames - gap
         
         self.max_width = int(self.frame_width * 0.95)
-        self.max_lines = self.frame_width // window_ratio // font.metrics('linespace')
+        self.max_lines = self.frame_width // window_ratio // \
+                         font.metrics('linespace')
         if not self.max_lines:
             self.max_lines = 1
         
     def delete_frames(self):
         items = self.canvas.find_all()
         children = self.canvas.winfo_children()
-        for index in range(len(children)):
+        for index, child in enumerate(children):
             self.canvas.delete(items[index])
-            children[index].destroy()
+            child.destroy()
         self.frame_list.clear()
 
     def create_frames(self):
         for frame in range(self.num_frames):
-            frame = tk.Frame(self.canvas, width=self.frame_width, background=main_background_color)
+            frame = tk.Frame(self.canvas, width=self.frame_width,
+                             background=main_background_color)
             frame.height = 0
             self.frame_list.append(frame)
             frame.pack_propagate(0)
@@ -160,14 +174,16 @@ class ScrollableNoteBoxView(tk.Frame):
         return next(frame for frame in frames if frame.height == smallest)
         
     def get_list_index(self, obj:tk.Tk) -> int:
-        return next((index for index, box in enumerate(self.box_list) if box is obj), None)
+        return next((index for index, box in enumerate(self.box_list)
+                     if box is obj), None)
     
     def create_boxes(self):
         for note in get_notes():
             notebox = self.create_box(note, self.max_width, self.max_lines)
             self.assign_box(notebox)
             
-    def create_box(self, path:str=None, width:int=0, lines:int=1, new:bool=False) -> tk.Tk:
+    def create_box(self, path:str=None, width:int=0, lines:int=1,
+                   new:bool=False) -> tk.Tk:
         notebox = NoteBox(self, path=path, width=width, lines=lines)
         if new:
             self.box_list.insert(0, notebox)
@@ -200,8 +216,9 @@ class ScrollableNoteBoxView(tk.Frame):
     def display_all(self):
         for index, frame in enumerate(self.frame_list):
             frame.config(height=frame.height)
-            frame.tag = self.canvas.create_window(index*self.frame_width + index*gap, 0,
-                                                  window=frame, anchor='nw')
+            frame.tag = self.canvas.create_window(index*self.frame_width +
+                                                  index*gap, 0, window=frame,
+                                                  anchor='nw')
             #  self.canvas.update()
         self.canvas.config(scrollregion=self.canvas.bbox('all'))
         
@@ -218,9 +235,11 @@ class ScrollableNoteBoxView(tk.Frame):
     def place_buttons(self):
         import_button_x = root.winfo_width() - self.scrollbar.winfo_width() - 2
         import_button_y = root.winfo_height() - 2
-        self.import_button.place(x=import_button_x, y=import_button_y, anchor='se')
-        self.new_button.place(x=import_button_x-self.import_button.winfo_reqwidth()-2,
-                              y=import_button_y, anchor='se')
+        new_button_x = import_button_x - self.import_button.winfo_reqwidth() - 2
+        new_button_y = import_button_y
+        self.import_button.place(x=import_button_x, y=import_button_y,
+                                 anchor='se')
+        self.new_button.place(x=new_button_x, y=new_button_y, anchor='se')
         
     def refresh(self):
         self.get_sizes()
@@ -246,9 +265,9 @@ class NoteBox(tk.Label):
     """Individual box that displays the note's text.
     
     There is always one box per note. Clicking on the box will open an EditText
-    window to edit the note's text. During a window resizing event, boxes are not
-    created or destroyed; their containing text is re-wrapped, and the boxes are
-    reassigned to the frames to ensure proper stacking.
+    window to edit the note's text. During a window resizing event, boxes are
+    not created or destroyed; their containing text is re-wrapped, and the
+    boxes are reassigned to the frames to ensure proper stacking.
     
     Args:
         parent (obj): Tkinter object that will contain the class.
@@ -256,8 +275,9 @@ class NoteBox(tk.Label):
         width (int, optional): Maximum width in pixels of text that the box can
                                display. Usually comes from max_width in
                                ScrollableNoteBoxView.
-        lines (int, optional): Maximum rows of text that the box can hold. Usually
-                               comes from max_lines in ScrollableNoteBoxView.
+        lines (int, optional): Maximum rows of text that the box can hold.
+                               Usually comes from max_lines in
+                               ScrollableNoteBoxView.
         background (str, optional): Tkinter color (defined word, 6-digit hex,
                                     etc.) for background.
     
@@ -276,8 +296,8 @@ class NoteBox(tk.Label):
     
     def __init__(self, parent:tk.Tk, path:str=None, width:int=0, lines:int=0,
                  background:str=box_color):
-        super().__init__(parent, background=background, anchor='w', justify='left',
-                         font=font, wrap=None)
+        super().__init__(parent, background=background, anchor='w',
+                         justify='left', font=font, wrap=None)
         self.parent = parent
         self.path = path
         self.bind('<Button-1>', self.on_click)
@@ -313,13 +333,14 @@ class NoteBox(tk.Label):
         self.body_text = '\n'.join(self.text_lines)
         
     def wrap_text(self, width:int, max_lines:int):
-        "Wrap text within label according to maximum width and maximum line count of label"
+        "Wrap text within label according to max width and max line count"
         wrap_count = 0
         wrap_list = []
         non_blank_regex = re.compile('\S')
         num_lines = len(self.text_lines)
         for line in self.text_lines:
-            while line and wrap_count < max_lines and non_blank_regex.search(line):
+            while line and wrap_count < max_lines and \
+                  non_blank_regex.search(line):
                 index = self.get_max_index(line, width)
                 if index != len(line) and wrap_count < max_lines - 1:
                     index = self.get_wrap_index(line, index)
@@ -361,7 +382,8 @@ class NoteBox(tk.Label):
         
     def get_new_date(self) -> str:
         current_time = time.localtime()
-        return "{}-{:02}-{:02}T{:02}_{:02}_{:02}.note".format(*current_time[0:6])
+        return "{}-{:02}-{:02}T{:02}_{:02}_{:02}.note".\
+                format(*current_time[0:6])
     
     def delete_note(self, from_button:bool=False):
         if self.path:
@@ -396,10 +418,13 @@ class EditText(tk.Frame):
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(1, weight=1)
         
-        self.back = tk.Label(self, text='\u2190', background=main_background_color)
+        self.back = tk.Label(self, text='\u2190',
+                             background=main_background_color)
         self.title = tk.Entry(self, background=box_color, font=font)
-        self.text = tk.Text(self, wrap='word', background=box_color, font=font, undo=True)
-        self.scrollbar = tk.Scrollbar(self, command=self.text.yview, background=box_color, width=3)
+        self.text = tk.Text(self, wrap='word', background=box_color,
+                            font=font, undo=True)
+        self.scrollbar = tk.Scrollbar(self, command=self.text.yview,
+                                      background=box_color, width=3)
         
         if notebox is None:
             self.new = True
@@ -450,7 +475,7 @@ class EditText(tk.Frame):
         root.main_view.refresh()
         
         
-def get_notes() -> List(str):
+def get_notes() -> List[str]:
     return sorted(glob.glob(os.path.join(notes_dir, '*.note')), reverse=True)
 
 def open_EditText(notebox:tk.Tk=None):
@@ -458,8 +483,10 @@ def open_EditText(notebox:tk.Tk=None):
     EditText(root, notebox=notebox)
     
 def open_import_dialog(window:tk.Tk, first_run:bool=False):
-    notes = filedialog.askopenfilenames(initialdir=os.path.expanduser('~/Downloads/Takeout/Keep'),
-                                        filetypes=(("HTML files", '*.html'), ("All files", '*.*')),
+    notes = filedialog.askopenfilenames(initialdir=os.path.expanduser\
+                                        ('~/Downloads/Takeout/Keep'),
+                                        filetypes=(("HTML files", '*.html'),
+                                        ("All files", '*.*')),
                                         title="Choose note(s) to import")
     if notes:
         import_notes(notes, first_run)
@@ -471,7 +498,7 @@ def check_for_directory():
     if not os.path.isdir(notes_dir):
         os.mkdir(notes_dir, mode=0o700)
 
-def import_notes(html_list:List(str), first_run:bool=False):
+def import_notes(html_list:List[str], first_run:bool=False):
     root.main_view.get_sizes()
     new_boxes = []
     pattern = re.compile('[JFMASOND][aepuco][nbrylgptvc] \d\d?, \d\d\d\d, \d[012]?:\d\d:\d\d [AP]M')
@@ -511,8 +538,9 @@ def import_notes(html_list:List(str), first_run:bool=False):
     root.main_view.refresh()
                 
 def process_date(date:str) -> str:
-    months = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06',
-                'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'}
+    months = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
+              'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
+              'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'}
     
     year = re.search('\d\d\d\d', date).group()
     month = months[date[0:3]]
@@ -522,11 +550,13 @@ def process_date(date:str) -> str:
     second = int(re.search('(?<=:)\d\d(?= )', date).group())
     
     daytime_bool = re.search('AM', date)
+    if not daytime_bool:
+        hour = hour + 12
     
     return "{}-{}-{:02}T{:02}_{:02}_{:02}.note".format(year,
                                                        month,
                                                        day,
-                                                       hour if daytime_bool else hour + 12,
+                                                       hour,
                                                        minute,
                                                        second)
     
