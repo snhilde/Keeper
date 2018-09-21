@@ -209,7 +209,7 @@ class ScrollableNoteBoxView(tk.Frame):
             del self.box_list[index]
         if from_button:
             if self.box_list:
-                self.refresh()
+                self.refresh_frames()
             else:
                 startWelcome()
         
@@ -229,7 +229,10 @@ class ScrollableNoteBoxView(tk.Frame):
             return
         
         self.place_buttons()
-        self.refresh()
+        self.get_sizes()
+        if current_num_frames != self.num_frames:
+            self.refresh_frames()
+        self.resize_widgets()
         self.lift_buttons()
         
     def place_buttons(self):
@@ -241,13 +244,17 @@ class ScrollableNoteBoxView(tk.Frame):
                                  anchor='se')
         self.new_button.place(x=new_button_x, y=new_button_y, anchor='se')
         
-    def refresh(self):
-        self.get_sizes()
+    def refresh_frames(self):
         self.delete_frames()
         self.create_frames()
-        self.resize_widgets()
         self.reassign_boxes()
         self.display_all()
+        #  self.get_sizes()
+        #  self.delete_frames()
+        #  self.create_frames()
+        #  self.resize_widgets()
+        #  self.reassign_boxes()
+        #  self.display_all()
         
     def resize_widgets(self):
         for index, frame in enumerate(self.frame_list):
@@ -472,7 +479,7 @@ class EditText(tk.Frame):
             self.notebox.text_lines = [line for line in body.split('\n')]
             
             self.notebox.update_note(filename)
-        root.main_view.refresh()
+        root.main_view.refresh_frames()
         
         
 def get_notes() -> List[str]:
@@ -535,7 +542,7 @@ def import_notes(html_list:List[str], first_run:bool=False):
         
         notebox.save_note(filename)
     root.main_view.box_list = new_boxes + root.main_view.box_list
-    root.main_view.refresh()
+    root.main_view.refresh_frames()
                 
 def process_date(date:str) -> str:
     months = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
