@@ -70,7 +70,7 @@ class FirstRunView(tk.Frame):
 class ScrollableNoteBoxView(tk.Frame):
     """The main view of the program, displays all notes.
     
-    This view is created when the program loads and hidden/shown when needed.
+    This view is created when the program loads and is hidden/shown when needed.
     
     Args:
         parent: Tkinter object that will contain the class.
@@ -276,6 +276,20 @@ class ScrollableNoteBoxView(tk.Frame):
         
 class NoteBox(tk.Label):
     """Individual box that displays the note's text.
+    
+    The box's contents are read from a saved note file or imported via
+    the filedialog. There are three components to each note: title,
+    date created, and body text.
+    Title (optional): This is the first line of the saved note file. If there
+                      is no text, then the first line is blank.
+    Date: This comes from the filename of the saved note file. If a note is
+          imported from Google Keep, then it retains the original date. If a
+          note is changed, then it is given a new date and saved with that
+          new date. Modification date is more important than creation date.
+          This means that the most recently modified notes will always
+          appear first.
+    Body Text: The actual note. Lines are stored with newlines in the saved
+               file but are stripped of newlines when imported.
     
     There is always one box per note. Clicking on the box will open an EditText
     window to edit the note's text. During a window resizing event, boxes are
