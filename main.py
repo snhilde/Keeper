@@ -9,13 +9,16 @@ import os
 import re
 import time
 
-notes_dir = os.path.expanduser('~/.local/share/keeper/notes')
-root = tk.Tk()
-root.title("Keeper")
-font = tkfont.Font()
+main_dir = os.path.expanduser('~/.local/share/keeper')
+notes_dir = os.path.join(main_dir, 'notes')
+
 main_background_color = '#E6E6E6'
 box_color = '#FAFAFA'
 gap = 10
+
+root = tk.Tk()
+root.title("Keeper")
+font = tkfont.Font()
 
 
 class FirstRunView(tk.Frame):
@@ -141,8 +144,11 @@ class ScrollableNoteBoxView(tk.Frame):
     def get_sizes(self):
         root.update_idletasks()
         
-        total_width = root.winfo_width() - 2*gap - self.scrollbar.winfo_width()
-        window_ratio = root.winfo_width() / root.winfo_height()
+        self.window_width = root.winfo_width()
+        self.window_height = root.winfo_height()
+        
+        total_width = self.window_width - 2*gap - self.scrollbar.winfo_width()
+        window_ratio = self.window_width / self.window_height
         
         self.num_frames = total_width // 300 + 1
         self.frame_width = (total_width + gap) // self.num_frames - gap
@@ -236,8 +242,8 @@ class ScrollableNoteBoxView(tk.Frame):
         self.lift_buttons()
         
     def place_buttons(self):
-        import_button_x = root.winfo_width() - self.scrollbar.winfo_width() - 2
-        import_button_y = root.winfo_height() - 2
+        import_button_x = self.window_width - self.scrollbar.winfo_width() - 2
+        import_button_y = self.window_height - 2
         new_button_x = import_button_x - self.import_button.winfo_reqwidth() - 2
         new_button_y = import_button_y
         self.import_button.place(x=import_button_x, y=import_button_y,
@@ -567,7 +573,28 @@ def process_date(date:str) -> str:
                                                        minute,
                                                        second)
     
+def save_window_dimensions():
+    path = os.path.join(main_dir, 'win_size')
+    fp = open(path, 'w+')
+    fp.write("{}x{}".format(root.winfo_width(), root.winfo_height()))
+    fp.close()
+    
+def read_window_dimensions():
+    path = os.path.join(main_dir, 'win_size')
+    if os.path.exists(path):
+        fp = open(path, 'r')
+        dimensions = fp.readline()
+        fp.close()
+        
+        root.geometry(dimensions)
+    
+def on_close():
+    save_window_dimensions()
+    root.destroy()
+    
 def main():
+    read_window_dimensions()
+    root.protocol("WM_DELETE_WINDOW", on_close)
     root.main_view = ScrollableNoteBoxView(root)
     if not get_notes():
         check_for_directory()
