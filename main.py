@@ -194,8 +194,8 @@ class ScrollableNoteBoxView(tk.Frame):
 
     def get_next_frame(self, frames:List[tk.Tk]) -> tk.Tk:
         """Return the next (shortest) frame that a notebox should be added to."""
-        smallest = min(frame.height for frame in frames)
-        return next(frame for frame in frames if frame.height == smallest)
+        shortest = min(frame.height for frame in frames)
+        return next(frame for frame in frames if frame.height == shortest)
         
     def get_list_index(self, obj:tk.Tk) -> int:
         """Return the index of the notebox in root's box_list."""
