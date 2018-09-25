@@ -4,18 +4,18 @@ Working clone of Google Keep for Linux
 # Table of Contents
 * [Installation](#installation)
 * [Prerequisites](#prerequisites)
+* [Build Details](#build-details)
 * [Getting Started](#getting-started)
 * [Usage](#usage)
 * [Future Additions](#future-additions)
 * [Contributing](#contributing)
 * [Author](#author)
 * [License](#license)
-* [Build Details](#build-details)
 
 
 ## Installation
 To download through GitHub:
-* `git clone https://github.com/snhilde/keeper
+* `git clone https://github.com/snhilde/keeper`
 
 Otherwise:
 * download the zip
@@ -50,6 +50,14 @@ To build your own executable, you will need PyInstaller:
 pip install pyinstaller
 ```
 
+## Build Details
+The included executable was built on this system:
+* Linux 4.18.9
+* Arch Linux current as of 09/12/2018
+* Python 3.7.0
+* Beautiful Soup 4.6.3
+* PyInstaller 3.4
+
 ## Getting Started
 If you want to import notes from Google Keep, then you first have to visit [Google Takeout](https://takeout.google.com). Select Keep from the options, download your archive, and unpack it. To import the notes into Keeper, select everything you want within the program. Keeper will do the rest.
 
@@ -71,11 +79,3 @@ Hilde N
 
 ## License
 This project is licensed under the MIT License. Do whatever you want with it. See the [LICENSE](LICENSE) file for details
-
-## Build Details
-The included executable was built on this system:
-* Linux 4.18.9
-* Arch Linux current as of 09/12/2018
-* Python 3.7.0
-* Beautiful Soup 4.6.3
-* PyInstaller 3.4
