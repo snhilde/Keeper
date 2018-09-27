@@ -70,6 +70,7 @@ If you want to import notes from Google Keep, then you first have to visit [Goog
 ## Future Additions
 * Add functionality for lists, checkboxes, etc.
 * Add ability to save images, hypertext links, charts, and other graphics.
+* Change title and body text comparision in EditText to hash rather than byte-by-byte string.
 
 ## Contributing
 Send a pull request or a message. Additional functionality is welcome, as are suggestions to make the program leaner, faster, and better performing.
